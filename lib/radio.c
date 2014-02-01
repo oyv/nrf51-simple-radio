@@ -258,6 +258,8 @@ uint32_t radio_receive_start(void)
     NVIC_EnableIRQ(RADIO_IRQn);
 
     NRF_RADIO->PACKETPTR = (uint32_t) &m_rx_packet;
+	
+	NRF_RADIO->TASKS_RXEN = 1;
 
     return SUCCESS;
 }
