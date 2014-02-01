@@ -8,9 +8,9 @@ packet_timer_timeout_callback m_timeout_callback;
 
 void TIMER0_IRQHandler(void)
 {
-    if (NRF_TIMER0->EVENTS_COMPARE[1] == 1 && NRF_TIMER0->INTENSET & (TIMER_INTENSET_COMPARE1_Msk))
+    if (NRF_TIMER0->EVENTS_COMPARE[0] == 1 && NRF_TIMER0->INTENSET & (TIMER_INTENSET_COMPARE0_Msk))
     {
-        NRF_TIMER0->EVENTS_COMPARE[1] = 0;
+        NRF_TIMER0->EVENTS_COMPARE[0] = 0;
 
         (*m_timeout_callback)();
     }
@@ -26,22 +26,13 @@ static void hfclk_stop(void)
     NRF_CLOCK->TASKS_HFCLKSTOP = 1;
 }
 
-void TIMER0_IRQHandler(void)
-{
-    if (NRF_TIMER0->EVENTS_COMPARE[1] == 1 && NRF_TIMER0->INTENSET & (TIMER_INTENSET_COMPARE1_Msk))
-    {
-        NRF_TIMER0->EVENTS_COMPARE[1] = 0;
-
-        m_timeout_callback();
-    }
-}
 
 void packet_timer_evt_handler(packet_timer_evt_t evt)
 {
     switch (evt)
     {
         case PACKET_TIMER_EVT_PACKET_RX:
-            NRF_TIMER0->INTENCLR = TIMER_INTENCLR_COMPARE1_Enabled << TIMER_INTENCLR_COMPARE1_Pos;
+            NRF_TIMER0->INTENCLR = TIMER_INTENCLR_COMPARE0_Enabled << TIMER_INTENCLR_COMPARE0_Pos;
             break;
     }
 }
@@ -68,8 +59,9 @@ void packet_timer_tx_prepare(packet_timer_timeout_callback timeout_callback)
     NRF_TIMER0->CC[0] = 1500;
     NRF_TIMER0->CC[1] = 2000;
     NRF_TIMER0->SHORTS = TIMER_SHORTS_COMPARE1_CLEAR_Enabled << TIMER_SHORTS_COMPARE1_CLEAR_Pos;
-    NRF_TIMER0->INTENSET = TIMER_INTENSET_COMPARE0_Enabled << TIMER_INTENSET_COMPARE0_Pos | 
-                           TIMER_INTENSET_COMPARE1_Enabled << TIMER_INTENSET_COMPARE1_Pos;
+//    NRF_TIMER0->INTENSET = TIMER_INTENSET_COMPARE0_Enabled << TIMER_INTENSET_COMPARE0_Pos | 
+//                           TIMER_INTENSET_COMPARE1_Enabled << TIMER_INTENSET_COMPARE1_Pos;
+    NRF_TIMER0->INTENSET = TIMER_INTENSET_COMPARE0_Enabled << TIMER_INTENSET_COMPARE0_Pos;
     NVIC_SetPriority(TIMER0_IRQn, 0);
     NVIC_EnableIRQ(TIMER0_IRQn);
 
