@@ -79,12 +79,15 @@ void RADIO_IRQHandler(void)
             case TX_ACK_RECEIVE:
                 packet_timer_evt_handler(PACKET_TIMER_EVT_PACKET_RX);
 
-                if (m_rx_packet.flags.ack == 1)
-                    evt_type = PACKET_SENT;
-                else
-                    evt_type = PACKET_LOST;
+//                if (m_rx_packet.flags.ack == 1)
+//                    evt_type = PACKET_SENT;
+//                else
+//                    evt_type = PACKET_LOST;
 
-                evt_queue_add(evt_type);
+//                evt_queue_add(evt_type);
+			
+			    if (m_rx_packet.flags.ack == 1)
+					evt_queue_add(PACKET_SENT);
 
                 if (tx_queue_is_empty())
                 {
