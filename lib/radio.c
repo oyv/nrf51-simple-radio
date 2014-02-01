@@ -88,7 +88,7 @@ void RADIO_IRQHandler(void)
 
                 if (tx_queue_is_empty())
                 {
-                    m_state = IDLE;
+                    m_state = RX_PACKET_RECEIVE;
                 }
                 else
                 {
@@ -139,7 +139,7 @@ void RADIO_IRQHandler(void)
 
             case TX_ACK_RECEIVE:
                 if (tx_queue_is_empty())
-                    PREPARE_DISABLE();
+                    PREPARE_RX();
                 else
                     PREPARE_TX();
                 break;
@@ -201,25 +201,37 @@ uint32_t radio_send(radio_packet_t * packet)
     if (err_code != SUCCESS)
         return err_code;
 
-    if (m_state != IDLE)
-        return SUCCESS;
 
-    m_state = TX_PACKET_SEND;
+    if (m_state == IDLE || m_state == RX_PACKET_RECEIVE)
+    {
+        packet_timer_tx_prepare(&on_packet_timer_timeout);
 
-    packet_timer_tx_prepare(on_packet_timer_timeout);
+        NRF_RADIO->RXADDRESSES = RADIO_RXADDRESSES_ADDR0_Enabled << RADIO_RXADDRESSES_ADDR0_Pos;
 
-    NRF_RADIO->RXADDRESSES = RADIO_RXADDRESSES_ADDR0_Enabled << RADIO_RXADDRESSES_ADDR0_Pos;
+        NRF_RADIO->SHORTS = RADIO_SHORTS_READY_START_Enabled << RADIO_SHORTS_READY_START_Pos |
+            RADIO_SHORTS_END_DISABLE_Enabled << RADIO_SHORTS_END_DISABLE_Pos |
+            RADIO_SHORTS_DISABLED_RXEN_Enabled << RADIO_SHORTS_DISABLED_RXEN_Pos;
 
-    NRF_RADIO->SHORTS = RADIO_SHORTS_READY_START_Enabled << RADIO_SHORTS_READY_START_Pos |
-        RADIO_SHORTS_END_DISABLE_Enabled << RADIO_SHORTS_END_DISABLE_Pos |
-        RADIO_SHORTS_DISABLED_RXEN_Enabled << RADIO_SHORTS_DISABLED_RXEN_Pos;
+        NRF_RADIO->INTENSET = RADIO_INTENSET_END_Enabled << RADIO_INTENSET_END_Pos | 
+            RADIO_INTENSET_DISABLED_Enabled << RADIO_INTENSET_DISABLED_Pos;
+        NVIC_SetPriority(RADIO_IRQn, 0);
+        NVIC_EnableIRQ(RADIO_IRQn);
 
-    NRF_RADIO->INTENSET = RADIO_INTENSET_END_Enabled << RADIO_INTENSET_END_Pos | 
-        RADIO_INTENSET_DISABLED_Enabled << RADIO_INTENSET_DISABLED_Pos;
-    NVIC_SetPriority(RADIO_IRQn, 0);
-    NVIC_EnableIRQ(RADIO_IRQn);
+        tx_packet_prepare();
 
-    tx_packet_prepare();
+        if (m_state == IDLE)
+        {
+            NRF_RADIO->TASKS_TXEN = 1;
+            NRF_TIMER0->TASKS_START = 1;
+        }
+        else if (m_state == RX_PACKET_RECEIVE)
+        {
+            PREPARE_TX();
+            NRF_RADIO->TASKS_DISABLE = 1;
+        }
+        m_state = TX_PACKET_SEND;
+            
+    }
 
     packet_timer_event_start();
 
