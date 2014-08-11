@@ -1031,7 +1031,7 @@
       <TopLine>0</TopLine>
       <CurrentLine>0</CurrentLine>
       <bDave2>0</bDave2>
-      <PathWithFileName>C:\Keil\ARM\Device\Nordic\nrf51822\Source\keil_arm_uv4.lnt</PathWithFileName>
+      <PathWithFileName>C:\Keil_v5\ARM\Device\Nordic\nrf51822\Source\keil_arm_uv4.lnt</PathWithFileName>
       <FilenameWithoutPath>keil_arm_uv4.lnt</FilenameWithoutPath>
       <RteFlg>0</RteFlg>
       <bShared>0</bShared>
@@ -1047,7 +1047,7 @@
       <TopLine>0</TopLine>
       <CurrentLine>0</CurrentLine>
       <bDave2>0</bDave2>
-      <PathWithFileName>C:\Keil\ARM\Device\Nordic\nrf51822\Source\templates\system_nrf51.c</PathWithFileName>
+      <PathWithFileName>C:\Keil_v5\ARM\Device\Nordic\nrf51822\Source\templates\system_nrf51.c</PathWithFileName>
       <FilenameWithoutPath>system_nrf51.c</FilenameWithoutPath>
       <RteFlg>0</RteFlg>
       <bShared>0</bShared>
@@ -1063,7 +1063,7 @@
       <TopLine>95</TopLine>
       <CurrentLine>105</CurrentLine>
       <bDave2>0</bDave2>
-      <PathWithFileName>C:\Keil\ARM\Device\Nordic\nrf51822\Source\templates\arm\arm_startup_nrf51.s</PathWithFileName>
+      <PathWithFileName>C:\Keil_v5\ARM\Device\Nordic\nrf51822\Source\templates\arm\arm_startup_nrf51.s</PathWithFileName>
       <FilenameWithoutPath>arm_startup_nrf51.s</FilenameWithoutPath>
       <RteFlg>0</RteFlg>
       <bShared>0</bShared>
