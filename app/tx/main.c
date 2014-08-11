@@ -13,6 +13,10 @@
 volatile uint32_t n_packets_sent = 0;
 volatile uint32_t n_packets_lost = 0;
 
+uint8_t dev_addr[5] = {0x01, 0x23, 0x45, 0x67, 0x89};
+uint8_t broadcast_addr[5] = {0xE7, 0xE7, 0xE7, 0xE7, 0xE7};
+uint8_t tx_addr[5] = {0x01, 0x23, 0x45, 0x67, 0x89};
+
 void error_handler(uint32_t err_code, uint32_t line_num, char * file_name)
 {
     volatile uint32_t m_err_code = err_code;
@@ -54,14 +58,12 @@ int main(void)
 
     leds_init();
 
-    radio_packet_t initial_packet;
-    initial_packet.len = 4;
-
     radio_packet_t packet;
     packet.len = 4;
 
-    radio_init(radio_evt_handler, &initial_packet);
-
+    radio_init(radio_evt_handler, broadcast_addr, dev_addr);
+    radio_set_tx_address(tx_addr);
+    
     while (1)
     {
         packet.data[0] = i++;

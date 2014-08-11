@@ -17,8 +17,6 @@ typedef struct __attribute__((packed))
     uint8_t data[RADIO_PACKET_MAX_LEN];
 } radio_packet_t;
 
-uint32_t dummy_packet_get(radio_packet_t ** packet);
-
 bool packet_is_empty(radio_packet_t* packet);
 
 #endif
