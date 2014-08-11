@@ -30,7 +30,7 @@ typedef struct
 
 typedef void (radio_evt_handler_t)(radio_evt_t * evt);
 
-uint32_t radio_init(radio_evt_handler_t * evt_handler, uint8_t * dev_addr, uint8_t * broadcast_addr);
+uint32_t radio_init(radio_evt_handler_t * evt_handler, uint8_t * broadcast_addr, uint8_t * dev_addr);
 uint32_t radio_start_tx(void);
 uint32_t radio_start_rx(void);
 uint32_t radio_stop_rx(void);

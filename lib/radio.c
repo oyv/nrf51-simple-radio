@@ -33,7 +33,7 @@ uint32_t prepare_rx(void);
 uint32_t prepare_tx(void);
 uint32_t prepare_idle(void);
 
-uint32_t radio_init(radio_evt_handler_t * evt_handler, uint8_t * dev_addr, uint8_t * broadcast_addr)
+uint32_t radio_init(radio_evt_handler_t * evt_handler, uint8_t * broadcast_addr, uint8_t * dev_addr)
 {
     m_state = IDLE;
 
@@ -53,7 +53,7 @@ uint32_t radio_init(radio_evt_handler_t * evt_handler, uint8_t * dev_addr, uint8
     NRF_RADIO->PCNF1 = 64 << RADIO_PCNF1_MAXLEN_Pos |
         (BASE_LEN)  << RADIO_PCNF1_BALEN_Pos;
 
-    radio_set_channel(80);
+    radio_set_channel(40);
     NRF_RADIO->TIFS = 150;
     NRF_RADIO->MODE = RADIO_MODE_MODE_Ble_1Mbit << RADIO_MODE_MODE_Pos;
 
@@ -120,12 +120,14 @@ uint32_t radio_set_channel(uint8_t channel)
 
 uint32_t set_address(uint8_t addr_num, uint8_t * address)
 {
-    volatile uint32_t * base = addr_num ? &(NRF_RADIO->BASE0) : &(NRF_RADIO->BASE1);
-    volatile uint32_t * prefix = (addr_num < 4) ? &(NRF_RADIO->PREFIX0) : &(NRF_RADIO->PREFIX1);
+    uint32_t base;
+    volatile uint32_t * base_ptr = addr_num ? &(NRF_RADIO->BASE1) : &(NRF_RADIO->BASE0);
+    volatile uint32_t * prefix_ptr = (addr_num < 4) ? &(NRF_RADIO->PREFIX0) : &(NRF_RADIO->PREFIX1);
     uint8_t prefix_offset = (addr_num % 4) * 8;
-    memcpy(base, address, BASE_LEN);
-    *prefix &= ~((uint32_t)(0xFF << prefix_offset));
-    *prefix |= (address[BASE_LEN] << prefix_offset);
+    memcpy(&base, address, BASE_LEN);
+    *base_ptr = base;
+    *prefix_ptr &= ~((uint32_t)(0xFF << prefix_offset));
+    *prefix_ptr |= (address[BASE_LEN] << prefix_offset);
     
     return SUCCESS;
 }
