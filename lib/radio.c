@@ -53,7 +53,7 @@ uint32_t radio_init(radio_evt_handler_t * evt_handler, uint8_t * broadcast_addr,
     NRF_RADIO->PCNF1 = 64 << RADIO_PCNF1_MAXLEN_Pos |
         (BASE_LEN)  << RADIO_PCNF1_BALEN_Pos;
 
-    radio_set_channel(40);
+    radio_set_channel(50);
     NRF_RADIO->TIFS = 150;
     NRF_RADIO->MODE = RADIO_MODE_MODE_Ble_1Mbit << RADIO_MODE_MODE_Pos;
 
@@ -102,8 +102,6 @@ uint32_t radio_start_rx()
 uint32_t radio_send(radio_packet_t * packet)
 {
     uint32_t err_code = tx_queue_add(packet);
-    if (m_state == IDLE)
-        radio_start_tx();
     return err_code;
 }
 
@@ -189,6 +187,7 @@ void RADIO_IRQHandler(void)
     if((NRF_RADIO->EVENTS_END == 1) && (NRF_RADIO->INTENSET & RADIO_INTENSET_END_Msk))
     {
         NRF_RADIO->EVENTS_END = 0;
+        
         switch(m_state)
         {
             case RX_PACKET_RECEIVE:

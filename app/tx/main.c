@@ -10,8 +10,11 @@
 #include "leds.h"
 #include "radio.h"
 
+#include "scheduled_event.h"
+
 volatile uint32_t n_packets_sent = 0;
 volatile uint32_t n_packets_lost = 0;
+volatile uint32_t n_packets_received = 0;
 
 uint8_t dev_addr[5] = {0x01, 0x23, 0x45, 0x67, 0x89};
 uint8_t broadcast_addr[5] = {0xE7, 0xE7, 0xE7, 0xE7, 0xE7};
@@ -42,7 +45,7 @@ void radio_evt_handler(radio_evt_t * evt)
 
         case PACKET_RECEIVED:
             led_toggle(LED0);
-            n_packets_lost++;
+            n_packets_received++;
             break;
 
         default:
@@ -64,6 +67,8 @@ int main(void)
     radio_init(radio_evt_handler, broadcast_addr, dev_addr);
     radio_set_tx_address(tx_addr);
     
+    scheduled_events_init();
+    
     while (1)
     {
         packet.data[0] = i++;
@@ -76,6 +81,6 @@ int main(void)
 
         radio_stop_rx();
 
-        nrf_delay_us(1000000);
+        nrf_delay_us(2000000);
     }
 }
