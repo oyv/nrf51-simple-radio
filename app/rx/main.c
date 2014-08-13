@@ -8,6 +8,7 @@
 #include "leds.h"
 #include "radio.h"
 
+volatile uint32_t n_packets_sent = 0;
 volatile uint32_t n_packets_received = 0;
 
 uint8_t dev_addr[5] = {0x01, 0x23, 0x45, 0x67, 0x89};
@@ -36,6 +37,10 @@ void radio_evt_handler(radio_evt_t * evt)
         case PACKET_RECEIVED:
             led_toggle(LED1);
             n_packets_received++;
+            break;
+        case PACKET_SENT:
+            led_toggle(LED2);
+            n_packets_sent++;
             break;
 
         default:
