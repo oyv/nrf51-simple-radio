@@ -62,7 +62,7 @@ uint32_t radio_init(radio_evt_handler_t * evt_handler, uint8_t * broadcast_addr,
     NRF_RADIO->CRCINIT = 0xFFFF;
     NRF_RADIO->CRCPOLY = 0x11021;
 
-    NRF_RADIO->INTENSET = RADIO_INTENSET_END_Enabled << RADIO_INTENSET_END_Pos;
+    NRF_RADIO->INTENSET = RADIO_INTENSET_DISABLED_Enabled << RADIO_INTENSET_DISABLED_Pos;
     NVIC_SetPriority(RADIO_IRQn, 0);
     NVIC_EnableIRQ(RADIO_IRQn);
 
@@ -184,9 +184,10 @@ void RADIO_IRQHandler(void)
 {
     uint32_t err_code = SUCCESS;
     
-    if((NRF_RADIO->EVENTS_END == 1) && (NRF_RADIO->INTENSET & RADIO_INTENSET_END_Msk))
+    if((NRF_RADIO->EVENTS_DISABLED == 1) && (NRF_RADIO->INTENSET & RADIO_INTENSET_DISABLED_Msk))
     {
-        NRF_RADIO->EVENTS_END = 0;
+        NRF_RADIO->EVENTS_DISABLED = 0;
+
         
         switch(m_state)
         {
@@ -205,7 +206,11 @@ void RADIO_IRQHandler(void)
 
                 err_code = prepare_rx();
                 break;
-
+            
+            case IDLE:
+                evt_queue_add(TRANSFER_EVENT_DONE);
+                break;
+            
             default:
                 break;
         }

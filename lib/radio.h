@@ -16,6 +16,7 @@ typedef enum
     PACKET_RECEIVED,
     PACKET_SENT,
     PACKET_LOST,
+    TRANSFER_EVENT_DONE,
 } radio_evt_type_t;
 
 
