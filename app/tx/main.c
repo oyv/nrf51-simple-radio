@@ -8,17 +8,13 @@
 #include "error.h"
 #include "gpio.h"
 #include "leds.h"
-#include "radio.h"
-
-#include "scheduled_event.h"
+#include "grasshopper.h"
+#include "scheduled_events.h"
 
 volatile uint32_t n_packets_sent = 0;
 volatile uint32_t n_packets_lost = 0;
 volatile uint32_t n_packets_received = 0;
 
-uint8_t dev_addr[5] = {0x01, 0x23, 0x45, 0x67, 0x89};
-uint8_t broadcast_addr[5] = {0xE7, 0xE7, 0xE7, 0xE7, 0xE7};
-uint8_t tx_addr[5] = {0x01, 0x23, 0x45, 0x67, 0x89};
 
 void error_handler(uint32_t err_code, uint32_t line_num, char * file_name)
 {
@@ -58,23 +54,22 @@ int main(void)
 {
     uint8_t i = 0; 
     uint32_t err_code;
+    schedule_time_t send_time, current_time;
 
     leds_init();
 
-    radio_packet_t packet;
-    packet.len = 4;
+    grasshopper_packet_t packet;
+    packet.radio_packet.len = 4;
 
-    radio_init(radio_evt_handler, broadcast_addr, dev_addr);
-    radio_set_tx_address(tx_addr);
-    
-    scheduled_events_init();
+    grasshopper_init(radio_evt_handler);
     
     while (1)
     {
-        packet.data[0] = i++;
-        packet.data[1] = 0x12;
+        scheduled_events_get_current_time(&current_time);
+        packet.radio_packet.data[0] = i++;
+        packet.radio_packet.data[1] = 0x12;
 
-        err_code = radio_send(&packet);
+        err_code = grasshopper_send_packet(&packet, send_time);
         ASSUME_SUCCESS(err_code);
 
         nrf_delay_us(2000);

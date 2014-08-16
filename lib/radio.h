@@ -35,6 +35,7 @@ uint32_t radio_init(radio_evt_handler_t * evt_handler, uint8_t * broadcast_addr,
 uint32_t radio_start_tx(void);
 uint32_t radio_start_rx(void);
 uint32_t radio_stop_rx(void);
+uint32_t radio_prepare_send(void);
 uint32_t radio_send(radio_packet_t * packet);
 uint32_t radio_set_channel(uint8_t channel);
 uint32_t radio_set_tx_address(uint8_t * address);

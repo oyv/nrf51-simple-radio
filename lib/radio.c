@@ -130,6 +130,19 @@ uint32_t set_address(uint8_t addr_num, uint8_t * address)
     return SUCCESS;
 }
 
+uint32_t radio_prepare_send()
+{
+    uint32_t err_code = prepare_tx();
+    
+    if (err_code == SUCCESS)
+    {
+        NRF_RADIO->SHORTS = RADIO_SHORTS_END_DISABLE_Enabled << RADIO_SHORTS_END_DISABLE_Pos |
+                            RADIO_SHORTS_DISABLED_RXEN_Enabled << RADIO_SHORTS_DISABLED_RXEN_Pos;
+    }
+    
+    return err_code;
+}
+
 uint32_t prepare_tx()
 {
     uint32_t err_code = SUCCESS;
@@ -188,7 +201,6 @@ void RADIO_IRQHandler(void)
     {
         NRF_RADIO->EVENTS_DISABLED = 0;
 
-        
         switch(m_state)
         {
             case RX_PACKET_RECEIVE:

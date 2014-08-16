@@ -3,7 +3,7 @@
 
 #include <stdint.h>
 
-#include "scheduled_event.h"
+#include "scheduled_events.h"
 
 typedef struct linked_list_node_t 
 { 
