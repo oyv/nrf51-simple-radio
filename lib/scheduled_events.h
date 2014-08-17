@@ -6,8 +6,8 @@
 
 typedef struct
 {
-    uint32_t rtc_tick : 24;
-    uint32_t timer_tick : 8;
+    uint32_t rtc_tick;
+    uint8_t timer_tick;
 } schedule_time_t;
 
 typedef void (scheduled_callback_t)(void);

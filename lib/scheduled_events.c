@@ -24,12 +24,13 @@
 static static_pool_t pool;
 static scheduled_event_t pool_array[N_SCHEDULED_EVENTS];
 
-static linked_list_t event_list;
+linked_list_t event_list;
 
 static scheduled_event_t * current_event = 0;
 static scheduled_event_t * next_event = 0;
 
 static scheduled_callback_t * current_callback;
+
 
 
 uint32_t schedule_new_event(void);
@@ -145,7 +146,10 @@ uint32_t normalize_time(schedule_time_t * time, schedule_time_t * current_time)
     if (current_time == 0)
         scheduled_events_get_current_time(current_time);
     
-    return ((time->rtc_tick + POW_2_24 - current_time->rtc_tick) % POW_2_24);
+    uint32_t time_rtc_tick = time->rtc_tick;
+    uint32_t current_rtc_tick = current_time->rtc_tick;
+    
+    return ((time_rtc_tick + POW_2_24 - current_rtc_tick) % POW_2_24);
 }
 
 bool schedule_time_is_valid_normalized(uint32_t time_normalized)
@@ -307,9 +311,9 @@ uint32_t event_rollover()
     err_code = schedule_new_event();
 
     if (current_event != 0)
-        err_code = linked_list_remove_node(&event_list, (linked_list_node_t *)&current_event);
+        err_code = linked_list_remove_node(&event_list, (linked_list_node_t *)current_event);
         
-    if (err_code == SUCCESS && old_current_event == 0)
+    if (old_current_event != 0)
         err_code = static_pool_free(&pool, (static_pool_node_t*)old_current_event);
     
     return err_code;

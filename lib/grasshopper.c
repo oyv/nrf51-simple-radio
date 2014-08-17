@@ -4,10 +4,13 @@
 
 #include "nrf51.h"
 #include "nrf51_bitfields.h"
+#include "nrf_delay.h"
 
 #include "radio.h"
 #include "scheduled_events.h"
 #include "error.h"
+
+#include "leds.h"
 
 uint8_t dev_addr[5] = {0x01, 0x23, 0x45, 0x67, 0x89};
 uint8_t broadcast_addr[5] = {0xE7, 0xE7, 0xE7, 0xE7, 0xE7};
@@ -18,6 +21,37 @@ uint16_t m_stop_rx_id;
 radio_evt_handler_t * m_evt_handler;
 
 void radio_evt_handler(radio_evt_t * evt);
+
+void test_init()
+{
+    NRF_GPIOTE->CONFIG[0] = (GPIOTE_CONFIG_MODE_Task << GPIOTE_CONFIG_MODE_Pos) |
+                            (LED0 << GPIOTE_CONFIG_PSEL_Pos) |
+                            (GPIOTE_CONFIG_POLARITY_Toggle << GPIOTE_CONFIG_POLARITY_Pos);
+    
+    
+}
+
+void grasshopper_test()
+{    
+    uint32_t err_code;
+    
+    scheduled_event_t test_event =
+    {
+        .task = &NRF_GPIOTE->TASKS_OUT[0],
+        .time = 
+        {
+            .rtc_tick = 60000,
+            .timer_tick = 0,
+        },
+        .callback = 0,
+    };
+    for (int i = 0; i < 9; i++)
+    {
+        err_code = scheduled_events_schedule(&test_event);
+        test_event.time.rtc_tick += 10000;
+    }
+    nrf_delay_us(5000000);
+}
 
 
 uint32_t grasshopper_init(radio_evt_handler_t * evt_handler)
@@ -31,6 +65,7 @@ uint32_t grasshopper_init(radio_evt_handler_t * evt_handler)
     
     radio_set_tx_address(tx_addr);
     
+    test_init();
     
     return err_code;
 }

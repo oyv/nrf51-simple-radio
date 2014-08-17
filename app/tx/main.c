@@ -15,6 +15,7 @@ volatile uint32_t n_packets_sent = 0;
 volatile uint32_t n_packets_lost = 0;
 volatile uint32_t n_packets_received = 0;
 
+volatile uint32_t test_counter = 0;
 
 void error_handler(uint32_t err_code, uint32_t line_num, char * file_name)
 {
@@ -65,10 +66,13 @@ int main(void)
 
     grasshopper_init(radio_evt_handler);
     
+    grasshopper_test();
+    
     while (1)
     {
+        test_counter++;
         scheduled_events_get_current_time(&current_time);
-        send_time.rtc_tick = current_time.rtc_tick + 30000;
+        send_time.rtc_tick = current_time.rtc_tick + 20000;
         packet.radio_packet.data[0] = i++;
         packet.radio_packet.data[1] = 0x12;
 
@@ -79,6 +83,6 @@ int main(void)
 
         radio_stop_rx();
 
-        nrf_delay_us(2000000);
+        nrf_delay_us(1000000);
     }
 }
