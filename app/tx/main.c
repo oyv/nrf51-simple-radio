@@ -30,7 +30,7 @@ void error_handler(uint32_t err_code, uint32_t line_num, char * file_name)
         }
     }
 }
-void radio_evt_handler(radio_evt_t * evt)
+static void radio_evt_handler(radio_evt_t * evt)
 {
     switch (evt->type)
     {
@@ -55,6 +55,8 @@ int main(void)
     uint8_t i = 0; 
     uint32_t err_code;
     schedule_time_t send_time, current_time;
+    
+    send_time.timer_tick = 0;
 
     leds_init();
 
@@ -66,6 +68,7 @@ int main(void)
     while (1)
     {
         scheduled_events_get_current_time(&current_time);
+        send_time.rtc_tick = current_time.rtc_tick + 30000;
         packet.radio_packet.data[0] = i++;
         packet.radio_packet.data[1] = 0x12;
 

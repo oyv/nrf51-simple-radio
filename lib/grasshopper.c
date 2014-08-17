@@ -13,6 +13,8 @@ uint8_t dev_addr[5] = {0x01, 0x23, 0x45, 0x67, 0x89};
 uint8_t broadcast_addr[5] = {0xE7, 0xE7, 0xE7, 0xE7, 0xE7};
 uint8_t tx_addr[5] = {0x01, 0x23, 0x45, 0x67, 0x89};
 
+uint16_t m_stop_rx_id;
+
 radio_evt_handler_t * m_evt_handler;
 
 void radio_evt_handler(radio_evt_t * evt);
@@ -48,12 +50,12 @@ void send_stop_rx_callback()
 }
 
 
-void radio_evt_handler(radio_evt_t * evt)
+static void radio_evt_handler(radio_evt_t * evt)
 {
     switch (evt->type)
     {
         case TRANSFER_EVENT_DONE:
-            // TODO: scheduled_events_cancel(xxxx);
+            scheduled_events_cancel(m_stop_rx_id);
             break;
             
         case PACKET_SENT:
@@ -102,13 +104,13 @@ uint32_t grasshopper_send_packet(grasshopper_packet_t * packet, schedule_time_t 
     
     scheduled_event_t send_event_stop_rx = 
     {
-        .task = 0,
+        .task = &NRF_RADIO->TASKS_DISABLE,
         .time = 
         {
             .rtc_tick = (time.rtc_tick + 50),
             .timer_tick = time.timer_tick,
         },
-        .callback = send_callback,
+        .callback = 0,
     };
     
     
@@ -120,7 +122,10 @@ uint32_t grasshopper_send_packet(grasshopper_packet_t * packet, schedule_time_t 
     if (err_code == SUCCESS)
         err_code = scheduled_events_schedule(&send_event_start_tx);
     if (err_code == SUCCESS)
+    {
         err_code = scheduled_events_schedule(&send_event_stop_rx);
+        m_stop_rx_id = send_event_stop_rx.id;
+    }
     
     return err_code;
 }
