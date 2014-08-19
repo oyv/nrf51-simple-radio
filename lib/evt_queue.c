@@ -18,7 +18,7 @@ void SWI0_IRQHandler(void)
     {
         radio_evt_t evt;
 
-        err_code = queue_get(&m_evt_queue, &evt.type);
+        err_code = queue_get(&m_evt_queue, (uint8_t*)&evt.type);
         ASSUME_SUCCESS(err_code);
 
         switch (evt.type)
