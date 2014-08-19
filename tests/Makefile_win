@@ -1,0 +1,53 @@
+# CPPUTEST_HOME = ../../tdd-nrf51/CppUTest-3.3
+CPPUTEST_HOME = ../../cpputest
+
+SDK_PATH = /c/keil_v5/ARM/Device/Nordic/
+
+INCLUDE_PATHS += ../lib/
+INCLUDE_PATHS += $(SDK_PATH)nrf51822/Include/
+INCLUDE_PATHS += $(SDK_PATH)nrf51822/Include/gcc/
+INCLUDE_PATHS += $(CPPUTEST_HOME)/include/
+INCLUDE_PATHS += /c/Keil_v5/ARM/PACK/ARM/CMSIS/3.20.4/CMSIS/Include/
+
+CPPFLAGS = -g $(addprefix -I, $(INCLUDE_PATHS))
+
+CXXFLAGS += -include $(CPPUTEST_HOME)/include/CppUTest/MemoryLeakDetectorNewMacros.h 
+CFLAGS += -include $(CPPUTEST_HOME)/include/CppUTest/MemoryLeakDetectorMallocMacros.h 
+LDFLAGS = -L$(CPPUTEST_HOME)/lib/ -lCppUTest -lpthread -lstdc++ 
+
+TARGET = all_tests
+
+# SOURCES_TESTS = $(wildcard *.cpp) 
+# OBJECTS_TESTS = $(SOURCES_TESTS:.cpp=.o) 
+
+# SOURCES_APP = $(SOURCES_TESTS:%.cpp=../lib/%.c)
+# SOURCES_APP = $(filter-out all_tests.c,SOURCES_TESTS)
+# OBJECTS_APP = $(SOURCES_APP:.c=.o)
+
+SOURCES_TESTS = linked_list_tests.cpp 
+OBJECTS_TESTS = $(SOURCES_TESTS:.cpp=.o) 
+
+SOURCES_APP = linked_list.c
+OBJECTS_APP = $(SOURCES_APP:.c=.o)
+
+CC = g++
+
+all: check
+
+rebuild: clean all
+
+check: $(TARGET)
+	./$(TARGET)
+
+clean:
+	rm -rf $(TARGET) $(OBJECTS_APP) $(OBJECTS_TESTS)
+
+$(TARGET): $(OBJECTS_APP) $(OBJECTS_TESTS)
+	$(CC) $^ -o $@ $(LDFLAGS)
+
+%.o: %.c
+	$(CC) $^ -o $@ $(LDFLAGS)
+    
+.PHONY: check
+
+
