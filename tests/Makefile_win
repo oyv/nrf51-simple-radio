@@ -27,7 +27,7 @@ TARGET = all_tests
 SOURCES_TESTS = linked_list_tests.cpp 
 OBJECTS_TESTS = $(SOURCES_TESTS:.cpp=.o) 
 
-SOURCES_APP = linked_list.c
+SOURCES_APP = ../lib/linked_list.c
 OBJECTS_APP = $(SOURCES_APP:.c=.o)
 
 CC = g++
@@ -42,11 +42,8 @@ check: $(TARGET)
 clean:
 	rm -rf $(TARGET) $(OBJECTS_APP) $(OBJECTS_TESTS)
 
-$(TARGET): $(OBJECTS_APP) $(OBJECTS_TESTS)
-	$(CC) $^ -o $@ $(LDFLAGS)
-
-%.o: %.c
-	$(CC) $^ -o $@ $(LDFLAGS)
+$(TARGET): 
+	$(CC) $(SOURCES_APP) $(SOURCES_TESTS) -o $@ $(CPPFLAGS) $(LDFLAGS)
     
 .PHONY: check
 
