@@ -6,10 +6,7 @@
 
 #include "linked_list.h"
 
-typedef union static_pool_node_t
-{
-    linked_list_node_t list_node;
-} static_pool_node_t;
+typedef linked_list_node_t static_pool_node_t;
 
 #define POOL_MAX_SIZE 10
 

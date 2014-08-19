@@ -26,7 +26,6 @@ static scheduled_event_t pool_array[N_SCHEDULED_EVENTS];
 
 linked_list_t event_list;
 
-static scheduled_event_t * current_event = 0;
 static scheduled_event_t * next_event = 0;
 
 static scheduled_callback_t * current_callback;
@@ -90,14 +89,14 @@ uint32_t scheduled_events_schedule(scheduled_event_t * event)
 {
     uint32_t err_code;
     int32_t new_index;
-    static_pool_node_t * new_event;
+    linked_list_node_t * new_event;
     err_code = static_pool_alloc(&pool, &new_event);
     if (err_code == SUCCESS)
     {
-        new_event->list_node.scheduled_event = *event;
-        insert_sorted(&event_list, &new_event->list_node, &new_index);
-        event->id = new_event->list_node.id;
-        new_event->list_node.scheduled_event.id = new_event->list_node.id;
+        new_event->scheduled_event = *event;
+        insert_sorted(&event_list, new_event, &new_index);
+        event->id = new_event->id;
+        new_event->scheduled_event.id = new_event->id;
         
         if (new_index == 0)
         {
@@ -302,6 +301,7 @@ uint32_t event_rollover()
 {
     uint32_t err_code;
     
+    static scheduled_event_t * current_event = 0;
     scheduled_event_t * old_current_event = current_event;
     current_event = next_event;
     
