@@ -4,6 +4,9 @@ RADIO_SRCS += packet.c
 RADIO_SRCS += evt_queue.c
 RADIO_SRCS += tx_queue.c
 RADIO_SRCS += rx_queue.c
+RADIO_SRCS += static_pool.c
+RADIO_SRCS += linked_list.c
+RADIO_SRCS += grasshopper.c
 
 RADIO_OBJS = $(addprefix $(OUTPUT_PATH), $(RADIO_SRCS:.c=.o))
 	
